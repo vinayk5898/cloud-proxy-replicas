@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fdc-sql-proxy-deployment
+  namespace: fdc-apps
+  labels:
+    app: fdc-sql-proxy
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: fdc-sql-proxy
+  template:
+    metadata:
+      labels:
+        app: fdc-sql-proxy
+    spec:
+      serviceAccountName: fdc-prod-sql-proxy-sa
+      containers:
+        - name: fdc-sql-proxy
+          image: us-central1-docker.pkg.dev/fdc-management/fdc-cloud-sql-proxy-us-ct1-01/sql-proxy:v0.1
+          command:
+            - "/cloud_sql_proxy"
+            - "-instances=fdc-production:us-central1:fdc-prod-mysql-apps-us-ct1-db-01=tcp:0.0.0.0:3306"
+          ports:
+            - containerPort: 3306
+#          volumeMounts:
+#          - mountPath: /config
+#            name: fdc-sql-proxy-sec   
+#      volumes:
+#      - name: fdc-sql-proxy-sec
+#        secret:
+#          secretName: fdc-sql-proxy-sec
